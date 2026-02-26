@@ -18,18 +18,36 @@ public class FeedService {
     }
 
     public List<Feed> getAllFeed(){
-        return feedRepository.findAll();
+        return feedRepository.findByDeletedFalse();
     }
 
     public Feed getFeedById(Long id){
-        return feedRepository.findById(id).orElse(null);
+        return feedRepository.findById(id)
+                .filter(feed -> !feed.isDeleted())
+                .orElseThrow(() -> new RuntimeException("Feed not found"));
     }
 
-    public Feed updateFeed(Feed feed){
-        return feedRepository.save(feed);
+    public Feed updateFeed(Long id, Feed updatedFeed){
+        Feed existing = feedRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feed not found"));
+
+        if(existing.isDeleted()){
+            throw new RuntimeException("Cannot update deleted feed");
+        }
+
+        existing.setName(updatedFeed.getName());
+        existing.setQuantity(updatedFeed.getQuantity());
+        existing.setPricePerUnit(updatedFeed.getPricePerUnit());
+        existing.setMinThreshold(updatedFeed.getMinThreshold());
+
+        return feedRepository.save(existing);
     }
 
     public void deleteFeed(Long id){
-        feedRepository.deleteById(id);
+        Feed feed = feedRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feed not found"));
+
+        feed.setDeleted(true);
+        feedRepository.save(feed);
     }
 }

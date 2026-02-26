@@ -1,44 +1,111 @@
 package com.example.cattlefeed.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "cattle")
 public class Cattle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Cattle name is required")
+    @Column(nullable = false)
     private String name;
+
+    @Min(value = 0, message = "Age cannot be negative")
+    @Column(nullable = false)
     private int age;
+
+    @NotBlank(message = "Breed is required")
+    @Column(nullable = false)
     private String breed;
+
+    @NotBlank(message = "Health status is required")
+    @Column(nullable = false)
     private String healthStatus;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // Constructor
-    public Cattle() {
+    private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    // ===============================
+    // Automatically Set Created Time
+    // ===============================
+    @PrePersist
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
-    // 👇 VERY IMPORTANT — Add Getters & Setters
+    // ===============================
+    // Automatically Set Updated Time
+    // ===============================
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ===============================
+    // Getters and Setters
+    // ===============================
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Long getId() {
+        return id;
+    }
 
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
+    public String getName() {
+        return name;
+    }
 
-    public String getBreed() { return breed; }
-    public void setBreed(String breed) { this.breed = breed; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getHealthStatus() { return healthStatus; }
-    public void setHealthStatus(String healthStatus) { this.healthStatus = healthStatus; }
+    public int getAge() {
+        return age;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getBreed() {
+        return breed;
+    }
+
+    public void setBreed(String breed) {
+        this.breed = breed;
+    }
+
+    public String getHealthStatus() {
+        return healthStatus;
+    }
+
+    public void setHealthStatus(String healthStatus) {
+        this.healthStatus = healthStatus;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted)
+    {
+        this.deleted = deleted;
+    }
 }

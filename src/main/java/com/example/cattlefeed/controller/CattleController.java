@@ -1,10 +1,14 @@
 package com.example.cattlefeed.controller;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import java.util.List;
 import com.example.cattlefeed.model.Cattle;
 import com.example.cattlefeed.service.CattleService;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/cattle")
 public class CattleController {
@@ -15,33 +19,58 @@ public class CattleController {
         this.service = service;
     }
 
-    // ✅ POST - Save Cattle
+    // ✅ CREATE
     @PostMapping
-    public Cattle save(@RequestBody Cattle cattle) {
-        return service.save(cattle);
+    public ResponseEntity<Cattle> save(@Valid @RequestBody Cattle cattle) {
+        return ResponseEntity.ok(service.save(cattle));
     }
 
-    // ✅ GET - Get All
+    // ✅ GET ALL
     @GetMapping
-    public List<Cattle> getAll() {
-        return service.getAll();
+    public ResponseEntity<List<Cattle>> getAll() {
+        return ResponseEntity.ok(service.getAll());
     }
 
-    // ✅ GET - By Id
+    // ✅ GET BY ID
     @GetMapping("/{id}")
-    public Cattle getById(@PathVariable Long id) {
-        return service.getById(id);
+    public ResponseEntity<Cattle> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
-    // ✅ DELETE
-    @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        service.delete(id);
-        return "Deleted Successfully";
-    }
+    // ✅ UPDATE
     @PutMapping("/{id}")
-    public Cattle update(@PathVariable Long id, @RequestBody Cattle cattle) {
-        cattle.setId(id);
-        return service.save(cattle);
+    public ResponseEntity<Cattle> update(
+            @PathVariable Long id,
+            @Valid @RequestBody Cattle cattle) {
+
+        return ResponseEntity.ok(service.update(id, cattle));
+    }
+
+    // ✅ SOFT DELETE
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.ok("Cattle deleted successfully");
+    }
+
+    // ✅ PAGINATION
+    @GetMapping("/page")
+    public ResponseEntity<Page<Cattle>> getPaginated(
+            @RequestParam int page,
+            @RequestParam int size) {
+
+        return ResponseEntity.ok(service.getAllPaginated(page, size));
+    }
+
+    // ✅ DASHBOARD COUNT
+    @GetMapping("/dashboard/total")
+    public ResponseEntity<Long> totalCattle() {
+        return ResponseEntity.ok(service.totalCattle());
+    }
+
+
+    @GetMapping("/dashboard/healthy")
+    public ResponseEntity<Long> healthyCount() {
+        return ResponseEntity.ok(service.healthyCount());
     }
 }

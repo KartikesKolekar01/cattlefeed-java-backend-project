@@ -1,24 +1,51 @@
 package com.example.cattlefeed.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="feed")
+@Table(name = "feed")
 public class Feed {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Feed name is required")
     private String name;
+
+    @Positive(message = "Quantity must be greater than 0")
     private double quantity;
+
+    @Positive(message = "Price per unit must be greater than 0")
     private double pricePerUnit;
+
+    @Min(value = 0, message = "Minimum threshold cannot be negative")
     private double minThreshold;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private boolean deleted = false;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Feed() {}
+
+    // Lifecycle Methods
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // Getters and Setters
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,6 +62,12 @@ public class Feed {
     public double getMinThreshold() { return minThreshold; }
     public void setMinThreshold(double minThreshold) { this.minThreshold = minThreshold; }
 
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
